@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rdap.hbenali.ovh/sitemap.xml
