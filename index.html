@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDAP Inspector · Domain & IP Registration Data</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="RDAP lookup tool - Query domain registration data, IP address information, and network resources using the modern Registration Data Access Protocol.">
+    <meta name="keywords" content="RDAP, WHOIS, domain lookup, IP registration, domain registrar, DNS, network information">
+    <meta name="author" content="Houssem Ben Ali">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <meta name="theme-color" content="#10b981">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #475569;
+            --accent: #10b981;
+            --accent-light: #34d399;
+            --accent-dark: #059669;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+        }
+
+        [data-theme="dark"] {
+            --primary: #f1f5f9;
+            --secondary: #94a3b8;
+            --accent: #34d399;
+            --accent-light: #6ee7b7;
+            --accent-dark: #10b981;
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 0%, rgba(6, 95, 70, 0.1), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 100%, rgba(52, 211, 153, 0.08), transparent);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .control-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .hero-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .query-type {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 3rem;
+            width: fit-content;
+        }
+
+        .type-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .type-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .type-btn:hover:not(.active) {
+            background: var(--bg-secondary);
+            color: var(--text);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        #queryInput {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--card-border);
+            border-radius: 3rem;
+            outline: none;
+            color: var(--text);
+            font-family: 'SF Mono', monospace;
+            transition: all 0.2s;
+        }
+
+        #queryInput:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        button {
+            background: var(--accent);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .example-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .example-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            transition: all 0.2s;
+        }
+
+        .example-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Result Area */
+        .result-area {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .result-header {
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            box-shadow: none;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--accent);
+            transform: none;
+        }
+
+        .result-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .data-section {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1rem;
+        }
+
+        .data-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .data-item {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+        }
+
+        .data-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .data-value {
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .data-value a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .data-value a:hover {
+            text-decoration: underline;
+        }
+
+        .json-viewer {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 1rem;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            color: #ef4444;
+        }
+
+        /* Guide Section */
+        .guide-section {
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+        }
+
+        .guide-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 0.5rem 1.2rem;
+            box-shadow: none;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--bg-secondary);
+            color: var(--text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .rdap-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                top: 1rem;
+                right: 1rem;
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="controls">
+        <button class="control-btn theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h1>RDAP Inspector</h1>
+            <p class="subhead">Registration Data Access Protocol — Modern replacement for WHOIS. Query domain and IP registration data with privacy protection and standardized responses.</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="query-type">
+                <button class="type-btn active" data-type="domain">🏷️ Domain</button>
+                <button class="type-btn" data-type="ip">🌐 IP Address</button>
+                <button class="type-btn" data-type="asn">🔢 ASN</button>
+            </div>
+            
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="text" id="queryInput" placeholder="example.com" value="hbenali.ovh">
+                    <button id="lookupBtn">
+                        <i class="fas fa-search"></i>
+                        <span>Lookup</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="example-links">
+                <span style="color: var(--text-secondary); font-size: 0.85rem;">Try:</span>
+                <a href="#" class="example-link" data-value="google.com">google.com</a>
+                <a href="#" class="example-link" data-value="github.com">github.com</a>
+                <a href="#" class="example-link" data-value="8.8.8.8">8.8.8.8</a>
+                <a href="#" class="example-link" data-value="1.1.1.1">1.1.1.1</a>
+                <a href="#" class="example-link" data-value="AS15169">AS15169 (Google)</a>
+                <a href="#" class="example-link" data-value="AS13335">AS13335 (Cloudflare)</a>
+            </div>
+        </div>
+
+        <!-- Result Area -->
+        <div class="result-area" id="resultArea" style="display: none;">
+            <div class="result-header">
+                <span class="result-title"><i class="fas fa-chart-line"></i> RDAP Response</span>
+                <button class="copy-btn" id="copyResultBtn"><i class="fas fa-copy"></i> Copy JSON</button>
+            </div>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem; display: block;"></i>
+            <p>Enter a domain name, IP address, or ASN to view RDAP registration data</p>
+        </div>
+
+        <div id="errorState" class="empty-state" style="display: none;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
+            <p id="errorMessage"></p>
+        </div>
+
+        <!-- Guide Section -->
+        <div class="guide-section">
+            <div class="guide-tabs">
+                <button class="tab-btn active" data-tab="about">ℹ️ About RDAP</button>
+                <button class="tab-btn" data-tab="compare">⚖️ RDAP vs WHOIS</button>
+                <button class="tab-btn" data-tab="fields">📋 Common Fields</button>
+            </div>
+            
+            <div class="tab-content active" id="aboutTab">
+                <p><strong>Registration Data Access Protocol (RDAP)</strong> is the modern replacement for WHOIS, developed by the IETF. It provides:</p>
+                <div class="rdap-info">
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <strong>Privacy Protection</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Standardized redaction of personal information</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-language" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <strong>Internationalization</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Supports UTF-8 and non-ASCII characters</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-code" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <strong>JSON Format</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Machine-readable responses for automation</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-link" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <strong>RESTful API</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Standardized endpoints and HTTP methods</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="compareTab">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border);">
+                            <th style="text-align: left; padding: 0.75rem;">Feature</th>
+                            <th style="text-align: left; padding: 0.75rem;">RDAP</th>
+                            <th style="text-align: left; padding: 0.75rem;">WHOIS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--card-border);">
+                            <td style="padding: 0.75rem;">Format</td>
+                            <td style="padding: 0.75rem;"><span class="tag" style="background: var(--accent); color: white;">JSON</span></td>
+                            <td style="padding: 0.75rem;">Plain text (inconsistent)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--card-border);">
+                            <td style="padding: 0.75rem;">Privacy</td>
+                            <td style="padding: 0.75rem;">✅ Standardized redaction</td>
+                            <td style="padding: 0.75rem;">❌ Varies by registrar</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--card-border);">
+                            <td style="padding: 0.75rem;">Internationalization</td>
+                            <td style="padding: 0.75rem;">✅ UTF-8 support</td>
+                            <td style="padding: 0.75rem;">❌ ASCII only</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--card-border);">
+                            <td style="padding: 0.75rem;">Protocol</td>
+                            <td style="padding: 0.75rem;">RESTful API (HTTPS)</td>
+                            <td style="padding: 0.75rem;">Port 43 (TCP)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;">Data Types</td>
+                            <td style="padding: 0.75rem;">Domains, IPs, ASNs, Entities</td>
+                            <td style="padding: 0.75rem;">Primarily domains</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="tab-content" id="fieldsTab">
+                <div class="data-grid">
+                    <div class="info-card">
+                        <strong><i class="fas fa-tag"></i> handle</strong>
+                        <p style="font-size: 0.85rem;">Unique identifier for the object</p>
+                    </div>
+                    <div class="info-card">
+                        <strong><i class="fas fa-building"></i> entities</strong>
+                        <p style="font-size: 0.85rem;">Registrar, registrant, admin, tech contacts</p>
+                    </div>
+                    <div class="info-card">
+                        <strong><i class="fas fa-calendar"></i> events</strong>
+                        <p style="font-size: 0.85rem;">Registration, expiration, last changed dates</p>
+                    </div>
+                    <div class="info-card">
+                        <strong><i class="fas fa-link"></i> links</strong>
+                        <p style="font-size: 0.85rem;">Related resources and self links</p>
+                    </div>
+                    <div class="info-card">
+                        <strong><i class="fas fa-check-circle"></i> status</strong>
+                        <p style="font-size: 0.85rem;">Object status (active, inactive, etc.)</p>
+                    </div>
+                    <div class="info-card">
+                        <strong><i class="fas fa-clock"></i> publicIds</strong>
+                        <p style="font-size: 0.85rem;">IANA registry identifiers</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🔍 RDAP Inspector · Uses official RDAP servers for domains (IANA), IPs (ARIN/RIPE/APNIC/AFRINIC/LACNIC), and ASNs · Privacy-protected registration data</p>
+            <p style="margin-top: 0.5rem;">© 2026 Houssem Ben Ali · <a href="https://github.com/hbenali" target="_blank" style="color: var(--accent);">GitHub</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Dark mode
+        const themeToggle = document.querySelector('.theme-toggle');
+        const icon = themeToggle.querySelector('i');
+
+        const getPreferredTheme = () => {
+            const saved = localStorage.getItem('theme');
+            if (saved) return saved;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const setTheme = (theme) => {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        };
+
+        setTheme(getPreferredTheme());
+        themeToggle.addEventListener('click', () => {
+            const current = document.body.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // State
+        let currentQueryType = 'domain';
+        let currentData = null;
+
+        // DOM elements
+        const queryInput = document.getElementById('queryInput');
+        const lookupBtn = document.getElementById('lookupBtn');
+        const resultArea = document.getElementById('resultArea');
+        const emptyState = document.getElementById('emptyState');
+        const errorState = document.getElementById('errorState');
+        const resultContent = document.getElementById('resultContent');
+        const errorMessage = document.getElementById('errorMessage');
+        const copyResultBtn = document.getElementById('copyResultBtn');
+
+        // RDAP endpoints
+        const RDAP_ENDPOINTS = {
+            domain: 'https://rdap.org/domain/',
+            ip: 'https://rdap.org/ip/',
+            asn: 'https://rdap.org/autnum/'
+        };
+
+        // Detect input type
+        function detectType(input) {
+            input = input.trim();
+            
+            // Check if ASN
+            if (input.toUpperCase().startsWith('AS')) {
+                return 'asn';
+            }
+            if (/^AS[0-9]+$/i.test(input)) {
+                return 'asn';
+            }
+            if (/^[0-9]+$/.test(input) && parseInt(input) < 1000000) {
+                return 'asn';
+            }
+            
+            // Check if IP
+            const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+            const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+            if (ipv4Pattern.test(input) || ipv6Pattern.test(input)) {
+                return 'ip';
+            }
+            
+            // Default to domain
+            return 'domain';
+        }
+
+        // Format RDAP data for display
+        function formatRDAPData(data, query, type) {
+            let html = '';
+            
+            // Basic info
+            html += `
+                <div class="data-section">
+                    <div class="section-title"><i class="fas fa-info-circle"></i> Basic Information</div>
+                    <div class="data-grid">
+                        <div class="data-item"><div class="data-label">Handle</div><div class="data-value">${escapeHtml(data.handle || 'N/A')}</div></div>
+                        <div class="data-item"><div class="data-label">Type</div><div class="data-value">${escapeHtml(data.objectClassName || type)}</div></div>
+                        <div class="data-item"><div class="data-label">Query</div><div class="data-value">${escapeHtml(query)}</div></div>
+                    </div>
+                </div>
+            `;
+            
+            // Events (dates)
+            if (data.events && data.events.length) {
+                html += `
+                    <div class="data-section">
+                        <div class="section-title"><i class="fas fa-calendar-alt"></i> Important Dates</div>
+                        <div class="data-grid">
+                `;
+                data.events.forEach(event => {
+                    const eventName = event.eventAction || 'event';
+                    html += `
+                        <div class="data-item">
+                            <div class="data-label">${escapeHtml(eventName.replace('_', ' ').toUpperCase())}</div>
+                            <div class="data-value">${escapeHtml(event.eventDate || 'N/A')}</div>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+            
+            // Entities (contacts)
+            if (data.entities && data.entities.length) {
+                html += `
+                    <div class="data-section">
+                        <div class="section-title"><i class="fas fa-users"></i> Contacts & Entities</div>
+                        <div class="data-grid">
+                `;
+                data.entities.forEach(entity => {
+                    const roles = entity.roles ? entity.roles.join(', ') : 'unknown';
+                    const name = entity.vcardArray ? 
+                        entity.vcardArray[1]?.find(v => v[0] === 'fn')?.[3] : 
+                        entity.handle || 'N/A';
+                    html += `
+                        <div class="data-item">
+                            <div class="data-label">${escapeHtml(roles)}</div>
+                            <div class="data-value">${escapeHtml(name)}</div>
+                            ${entity.handle ? `<div class="data-value" style="font-size: 0.8rem;">Handle: ${escapeHtml(entity.handle)}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+            
+            // Nameservers (for domains)
+            if (data.nameservers && data.nameservers.length) {
+                html += `
+                    <div class="data-section">
+                        <div class="section-title"><i class="fas fa-server"></i> Nameservers</div>
+                        <div class="data-grid">
+                `;
+                data.nameservers.forEach(ns => {
+                    html += `
+                        <div class="data-item"><div class="data-value">${escapeHtml(ns.ldhName || ns.handle)}</div></div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+            
+            // Status
+            if (data.status && data.status.length) {
+                html += `
+                    <div class="data-section">
+                        <div class="section-title"><i class="fas fa-flag-checkered"></i> Status</div>
+                        <div class="data-grid">
+                `;
+                data.status.forEach(status => {
+                    html += `<div class="data-item"><div class="data-value">${escapeHtml(status)}</div></div>`;
+                });
+                html += `</div></div>`;
+            }
+            
+            // Public IDs
+            if (data.publicIds && data.publicIds.length) {
+                html += `
+                    <div class="data-section">
+                        <div class="section-title"><i class="fas fa-id-card"></i> Registry Identifiers</div>
+                        <div class="data-grid">
+                `;
+                data.publicIds.forEach(id => {
+                    html += `
+                        <div class="data-item">
+                            <div class="data-label">${escapeHtml(id.type || 'Identifier')}</div>
+                            <div class="data-value">${escapeHtml(id.identifier || 'N/A')}</div>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+            
+            // Full JSON (collapsible)
+            html += `
+                <div class="data-section">
+                    <div class="section-title"><i class="fas fa-code"></i> Full RDAP Response (JSON)</div>
+                    <div class="json-viewer">${escapeHtml(JSON.stringify(data, null, 2))}</div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Perform RDAP lookup
+        async function performLookup() {
+            let query = queryInput.value.trim();
+            if (!query) {
+                showError('Please enter a domain, IP address, or ASN');
+                return;
+            }
+            
+            // Auto-detect type
+            const detectedType = detectType(query);
+            currentQueryType = detectedType;
+            
+            // Update active button visually
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-type') === detectedType) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Format ASN properly
+            let lookupQuery = query;
+            if (detectedType === 'asn') {
+                if (!query.toUpperCase().startsWith('AS')) {
+                    lookupQuery = `AS${query}`;
+                } else {
+                    lookupQuery = query.toUpperCase();
+                }
+            }
+            
+            const endpoint = RDAP_ENDPOINTS[detectedType];
+            const url = endpoint + encodeURIComponent(lookupQuery);
+            
+            // Show loading
+            lookupBtn.disabled = true;
+            lookupBtn.innerHTML = '<span class="loader"></span> Looking up...';
+            resultArea.style.display = 'none';
+            emptyState.style.display = 'none';
+            errorState.style.display = 'none';
+            
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                currentData = data;
+                
+                resultContent.innerHTML = formatRDAPData(data, query, detectedType);
+                resultArea.style.display = 'block';
+                
+            } catch (err) {
+                console.error('RDAP lookup error:', err);
+                showError(`Failed to lookup "${query}": ${err.message}<br><br>Note: Not all domains/IPs have RDAP records available.`);
+            } finally {
+                lookupBtn.disabled = false;
+                lookupBtn.innerHTML = '<i class="fas fa-search"></i> Lookup';
+            }
+        }
+
+        function showError(message) {
+            errorMessage.innerHTML = message;
+            errorState.style.display = 'block';
+            resultArea.style.display = 'none';
+            emptyState.style.display = 'none';
+        }
+
+        // Copy JSON
+        copyResultBtn.addEventListener('click', () => {
+            if (currentData) {
+                navigator.clipboard.writeText(JSON.stringify(currentData, null, 2));
+                const originalText = copyResultBtn.innerHTML;
+                copyResultBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copyResultBtn.innerHTML = originalText;
+                }, 2000);
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                if (tabId === 'about') document.getElementById('aboutTab').classList.add('active');
+                if (tabId === 'compare') document.getElementById('compareTab').classList.add('active');
+                if (tabId === 'fields') document.getElementById('fieldsTab').classList.add('active');
+            });
+        });
+
+        // Type buttons
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.getAttribute('data-type');
+                currentQueryType = type;
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                queryInput.placeholder = type === 'domain' ? 'example.com' : (type === 'ip' ? '8.8.8.8' : 'AS15169');
+            });
+        });
+
+        // Example links
+        document.querySelectorAll('.example-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const value = link.getAttribute('data-value');
+                queryInput.value = value;
+                performLookup();
+            });
+        });
+
+        // Enter key
+        queryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performLookup();
+        });
+
+        // Auto-lookup on load
+        setTimeout(() => performLookup(), 100);
+    </script>
+</body>
+</html>
