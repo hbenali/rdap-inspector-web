@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 · RDAP Not Found</title>
+    <meta name="description" content="The page you're looking for doesn't exist. Head back to RDAP Inspector to query domain, IP, or ASN registration data.">
     <meta name="robots" content="noindex, follow">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#10b981">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -38,6 +44,9 @@
             font-weight: 600;
         }
         .btn:hover { background: #059669; }
+        footer { margin-top: 1.5rem; color: #64748b; font-size: 0.85rem; }
+        footer a { color: #94a3b8; text-decoration: underline; }
+        footer a:hover { color: #34d399; }
     </style>
 </head>
 <body>
@@ -46,6 +55,7 @@
         <h1>RDAP Record Not Found</h1>
         <p>The registration data you're looking for doesn't exist or isn't available via RDAP.</p>
         <a href="/" class="btn">← Back to RDAP Inspector</a>
+        <footer>rdap.hbenali.ovh · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a></footer>
     </div>
 </body>
 </html>

@@ -3,25 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RDAP Inspector · Domain & IP Registration Data</title>
-    
+    <title>RDAP Inspector — Domain, IP & ASN Registration Lookup</title>
+
     <!-- SEO -->
-    <meta name="description" content="RDAP lookup tool - Query domain registration data, IP address information, and network resources using the modern Registration Data Access Protocol.">
+    <meta name="description" content="Free RDAP lookup tool. Query domain, IP address, and ASN registration data using the modern Registration Data Access Protocol — the standardized, privacy-aware replacement for WHOIS.">
     <meta name="keywords" content="RDAP, WHOIS, domain lookup, IP registration, domain registrar, DNS, network information">
     <meta name="author" content="Houssem Ben Ali">
-    
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://rdap.hbenali.ovh/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="RDAP Inspector — Domain, IP & ASN Registration Lookup">
+    <meta property="og:description" content="Query domain, IP address, and ASN registration data using the modern RDAP protocol — the privacy-aware replacement for WHOIS.">
+    <meta property="og:url" content="https://rdap.hbenali.ovh/">
+    <meta property="og:site_name" content="RDAP Inspector">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://rdap.hbenali.ovh/favicon.svg">
+    <meta property="og:image:type" content="image/svg+xml">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="RDAP Inspector — Domain, IP & ASN Registration Lookup">
+    <meta name="twitter:description" content="Query domain, IP address, and ASN registration data using the modern RDAP protocol — the privacy-aware replacement for WHOIS.">
+    <meta name="twitter:image" content="https://rdap.hbenali.ovh/favicon.svg">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="alternate icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#10b981">
-    
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- rdap.org is only hit on-demand after a lookup -->
+    <link rel="dns-prefetch" href="https://rdap.org">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "url": "https://rdap.hbenali.ovh/",
+          "name": "RDAP Inspector",
+          "description": "Free RDAP lookup tool for domain, IP address, and ASN registration data.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://rdap.hbenali.ovh/?query={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "name": "RDAP Inspector",
+          "url": "https://rdap.hbenali.ovh/",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Any",
+          "description": "Query domain, IP address, and ASN registration data using the modern RDAP protocol.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }
+      ]
+    }
+    </script>
+
     <style>
         :root {
             --primary: #0f172a;
@@ -71,12 +119,24 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.7;
             color: var(--text);
             background: var(--bg);
             transition: background-color 0.4s ease, color 0.4s ease;
             min-height: 100vh;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         /* Animated Background */
@@ -86,7 +146,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent),
                 radial-gradient(ellipse 60% 40% at 100% 0%, rgba(6, 95, 70, 0.1), transparent),
                 radial-gradient(ellipse 50% 30% at 0% 100%, rgba(52, 211, 153, 0.08), transparent);
@@ -129,6 +189,10 @@
             }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .particle { display: none; }
+        }
+
         /* Controls */
         .controls {
             position: fixed;
@@ -160,6 +224,12 @@
             transform: scale(1.1);
         }
 
+        .theme-icon svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
         /* Main Container */
         .container {
             max-width: 1200px;
@@ -185,9 +255,8 @@
             box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
         }
 
-        .hero-icon i {
+        .hero-icon span {
             font-size: 2.5rem;
-            color: white;
         }
 
         h1 {
@@ -318,6 +387,7 @@
         .example-links {
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
             gap: 1rem;
             justify-content: center;
             margin-top: 1rem;
@@ -361,6 +431,7 @@
         .result-title {
             font-weight: 600;
             color: var(--accent);
+            font-size: 1rem;
         }
 
         .copy-btn {
@@ -395,6 +466,7 @@
 
         .section-title {
             font-weight: 600;
+            font-size: 1rem;
             color: var(--accent);
             margin-bottom: 1rem;
             display: flex;
@@ -524,25 +596,34 @@
             font-size: 0.85rem;
         }
 
+        .footer a {
+            color: var(--text-secondary);
+            text-decoration: underline;
+        }
+
+        .footer a:hover {
+            color: var(--accent);
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 2rem 1rem;
             }
-            
+
             h1 {
                 font-size: 1.8rem;
             }
-            
+
             .controls {
                 top: 1rem;
                 right: 1rem;
             }
-            
+
             .control-btn {
                 width: 40px;
                 height: 40px;
             }
-            
+
             .data-grid {
                 grid-template-columns: 1fr;
             }
@@ -555,8 +636,8 @@
     <div class="particles" id="particles"></div>
 
     <div class="controls">
-        <button class="control-btn theme-toggle" aria-label="Toggle dark mode">
-            <i class="fas fa-moon"></i>
+        <button class="control-btn theme-toggle" type="button" aria-label="Toggle dark mode">
+            <span class="theme-icon" aria-hidden="true"></span>
         </button>
     </div>
 
@@ -564,7 +645,7 @@
         <!-- Hero Section -->
         <div class="hero">
             <div class="hero-icon">
-                <i class="fas fa-database"></i>
+                <span aria-hidden="true">🗄️</span>
             </div>
             <h1>RDAP Inspector</h1>
             <p class="subhead">Registration Data Access Protocol — Modern replacement for WHOIS. Query domain and IP registration data with privacy protection and standardized responses.</p>
@@ -572,87 +653,90 @@
 
         <!-- Input Section -->
         <div class="input-section">
-            <div class="query-type">
-                <button class="type-btn active" data-type="domain">🏷️ Domain</button>
-                <button class="type-btn" data-type="ip">🌐 IP Address</button>
-                <button class="type-btn" data-type="asn">🔢 ASN</button>
+            <h2 class="sr-only">Look up a domain, IP address, or ASN</h2>
+            <div class="query-type" role="group" aria-label="Query type">
+                <button class="type-btn active" type="button" data-type="domain" aria-pressed="true">🏷️ Domain</button>
+                <button class="type-btn" type="button" data-type="ip" aria-pressed="false">🌐 IP Address</button>
+                <button class="type-btn" type="button" data-type="asn" aria-pressed="false">🔢 ASN</button>
             </div>
-            
+
             <div class="input-group">
                 <div class="input-wrapper">
-                    <input type="text" id="queryInput" placeholder="example.com" value="hbenali.ovh">
-                    <button id="lookupBtn">
-                        <i class="fas fa-search"></i>
+                    <label for="queryInput" class="sr-only">Domain, IP address, or ASN</label>
+                    <input type="text" id="queryInput" placeholder="example.com" value="hbenali.ovh" autocomplete="off" spellcheck="false">
+                    <button id="lookupBtn" type="button">
+                        <span aria-hidden="true">🔍</span>
                         <span>Lookup</span>
                     </button>
                 </div>
             </div>
-            
+
             <div class="example-links">
                 <span style="color: var(--text-secondary); font-size: 0.85rem;">Try:</span>
                 <a href="#" class="example-link" data-value="google.com">google.com</a>
                 <a href="#" class="example-link" data-value="github.com">github.com</a>
                 <a href="#" class="example-link" data-value="8.8.8.8">8.8.8.8</a>
-                <a href="#" class="example-link" data-value="1.1.1.1">1.1.1.1</a>
+                <a href="#" class="example-link" data-value="2606:4700:4700::1111">2606:4700:4700::1111</a>
                 <a href="#" class="example-link" data-value="AS15169">AS15169 (Google)</a>
                 <a href="#" class="example-link" data-value="AS13335">AS13335 (Cloudflare)</a>
             </div>
         </div>
 
         <!-- Result Area -->
-        <div class="result-area" id="resultArea" style="display: none;">
+        <div class="result-area" id="resultArea" style="display: none;" aria-live="polite">
             <div class="result-header">
-                <span class="result-title"><i class="fas fa-chart-line"></i> RDAP Response</span>
-                <button class="copy-btn" id="copyResultBtn"><i class="fas fa-copy"></i> Copy JSON</button>
+                <h2 class="result-title">📈 RDAP Response</h2>
+                <button class="copy-btn" id="copyResultBtn" type="button"><span aria-hidden="true">📋</span> Copy JSON</button>
             </div>
             <div class="result-content" id="resultContent"></div>
         </div>
 
         <div class="empty-state" id="emptyState">
-            <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem; display: block;"></i>
+            <span aria-hidden="true" style="font-size: 3rem; opacity: 0.5; margin-bottom: 1rem; display: block;">🔍</span>
             <p>Enter a domain name, IP address, or ASN to view RDAP registration data</p>
         </div>
 
-        <div id="errorState" class="empty-state" style="display: none;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;"></i>
+        <div id="errorState" class="empty-state" style="display: none;" aria-live="polite">
+            <span aria-hidden="true" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem; display: block;">⚠️</span>
             <p id="errorMessage"></p>
         </div>
 
         <!-- Guide Section -->
         <div class="guide-section">
-            <div class="guide-tabs">
-                <button class="tab-btn active" data-tab="about">ℹ️ About RDAP</button>
-                <button class="tab-btn" data-tab="compare">⚖️ RDAP vs WHOIS</button>
-                <button class="tab-btn" data-tab="fields">📋 Common Fields</button>
+            <h2 class="sr-only">RDAP guide</h2>
+            <div class="guide-tabs" role="tablist" aria-label="RDAP guide topics">
+                <button class="tab-btn active" id="tabAbout" type="button" role="tab" aria-selected="true" aria-controls="aboutTab" tabindex="0">ℹ️ About RDAP</button>
+                <button class="tab-btn" id="tabCompare" type="button" role="tab" aria-selected="false" aria-controls="compareTab" tabindex="-1">⚖️ RDAP vs WHOIS</button>
+                <button class="tab-btn" id="tabFields" type="button" role="tab" aria-selected="false" aria-controls="fieldsTab" tabindex="-1">📋 Common Fields</button>
             </div>
-            
-            <div class="tab-content active" id="aboutTab">
+
+            <div class="tab-content active" id="aboutTab" role="tabpanel" aria-labelledby="tabAbout" tabindex="0">
                 <p><strong>Registration Data Access Protocol (RDAP)</strong> is the modern replacement for WHOIS, developed by the IETF. It provides:</p>
                 <div class="rdap-info">
                     <div class="info-card">
-                        <i class="fas fa-shield-alt" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <span aria-hidden="true" style="color: var(--accent); margin-bottom: 0.5rem; display: block; font-size: 1.3rem;">🛡️</span>
                         <strong>Privacy Protection</strong>
                         <p style="font-size: 0.9rem; margin-top: 0.25rem;">Standardized redaction of personal information</p>
                     </div>
                     <div class="info-card">
-                        <i class="fas fa-language" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <span aria-hidden="true" style="color: var(--accent); margin-bottom: 0.5rem; display: block; font-size: 1.3rem;">🗣️</span>
                         <strong>Internationalization</strong>
                         <p style="font-size: 0.9rem; margin-top: 0.25rem;">Supports UTF-8 and non-ASCII characters</p>
                     </div>
                     <div class="info-card">
-                        <i class="fas fa-code" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <span aria-hidden="true" style="color: var(--accent); margin-bottom: 0.5rem; display: block; font-size: 1.3rem;">💻</span>
                         <strong>JSON Format</strong>
                         <p style="font-size: 0.9rem; margin-top: 0.25rem;">Machine-readable responses for automation</p>
                     </div>
                     <div class="info-card">
-                        <i class="fas fa-link" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+                        <span aria-hidden="true" style="color: var(--accent); margin-bottom: 0.5rem; display: block; font-size: 1.3rem;">🔗</span>
                         <strong>RESTful API</strong>
                         <p style="font-size: 0.9rem; margin-top: 0.25rem;">Standardized endpoints and HTTP methods</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="tab-content" id="compareTab">
+
+            <div class="tab-content" id="compareTab" role="tabpanel" aria-labelledby="tabCompare" tabindex="0">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--card-border);">
@@ -664,7 +748,7 @@
                     <tbody>
                         <tr style="border-bottom: 1px solid var(--card-border);">
                             <td style="padding: 0.75rem;">Format</td>
-                            <td style="padding: 0.75rem;"><span class="tag" style="background: var(--accent); color: white;">JSON</span></td>
+                            <td style="padding: 0.75rem;"><span style="background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 1rem;">JSON</span></td>
                             <td style="padding: 0.75rem;">Plain text (inconsistent)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--card-border);">
@@ -690,31 +774,31 @@
                     </tbody>
                 </table>
             </div>
-            
-            <div class="tab-content" id="fieldsTab">
+
+            <div class="tab-content" id="fieldsTab" role="tabpanel" aria-labelledby="tabFields" tabindex="0">
                 <div class="data-grid">
                     <div class="info-card">
-                        <strong><i class="fas fa-tag"></i> handle</strong>
+                        <strong>🏷️ handle</strong>
                         <p style="font-size: 0.85rem;">Unique identifier for the object</p>
                     </div>
                     <div class="info-card">
-                        <strong><i class="fas fa-building"></i> entities</strong>
+                        <strong>🏢 entities</strong>
                         <p style="font-size: 0.85rem;">Registrar, registrant, admin, tech contacts</p>
                     </div>
                     <div class="info-card">
-                        <strong><i class="fas fa-calendar"></i> events</strong>
+                        <strong>📅 events</strong>
                         <p style="font-size: 0.85rem;">Registration, expiration, last changed dates</p>
                     </div>
                     <div class="info-card">
-                        <strong><i class="fas fa-link"></i> links</strong>
+                        <strong>🔗 links</strong>
                         <p style="font-size: 0.85rem;">Related resources and self links</p>
                     </div>
                     <div class="info-card">
-                        <strong><i class="fas fa-check-circle"></i> status</strong>
+                        <strong>✅ status</strong>
                         <p style="font-size: 0.85rem;">Object status (active, inactive, etc.)</p>
                     </div>
                     <div class="info-card">
-                        <strong><i class="fas fa-clock"></i> publicIds</strong>
+                        <strong>🆔 publicIds</strong>
                         <p style="font-size: 0.85rem;">IANA registry identifiers</p>
                     </div>
                 </div>
@@ -723,7 +807,7 @@
 
         <div class="footer">
             <p>🔍 RDAP Inspector · Uses official RDAP servers for domains (IANA), IPs (ARIN/RIPE/APNIC/AFRINIC/LACNIC), and ASNs · Privacy-protected registration data</p>
-            <p style="margin-top: 0.5rem;">© 2026 Houssem Ben Ali · <a href="https://github.com/hbenali" target="_blank" style="color: var(--accent);">GitHub</a></p>
+            <p style="margin-top: 0.5rem;">© 2026 Houssem Ben Ali · <a href="https://github.com/hbenali" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a></p>
         </div>
     </div>
 
@@ -731,6 +815,7 @@
         // Particles
         function createParticles() {
             const container = document.getElementById('particles');
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
@@ -744,7 +829,10 @@
 
         // Dark mode
         const themeToggle = document.querySelector('.theme-toggle');
-        const icon = themeToggle.querySelector('i');
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+
+        const MOON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        const SUN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
 
         const getPreferredTheme = () => {
             const saved = localStorage.getItem('theme');
@@ -755,7 +843,7 @@
         const setTheme = (theme) => {
             document.body.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            themeIcon.innerHTML = theme === 'dark' ? SUN_SVG : MOON_SVG;
         };
 
         setTheme(getPreferredTheme());
@@ -788,25 +876,22 @@
         // Detect input type
         function detectType(input) {
             input = input.trim();
-            
-            // Check if ASN
-            if (input.toUpperCase().startsWith('AS')) {
-                return 'asn';
-            }
+
+            // ASN: "AS12345" or a bare small integer
             if (/^AS[0-9]+$/i.test(input)) {
                 return 'asn';
             }
-            if (/^[0-9]+$/.test(input) && parseInt(input) < 1000000) {
+            if (/^[0-9]+$/.test(input) && parseInt(input, 10) < 1000000) {
                 return 'asn';
             }
-            
-            // Check if IP
+
+            // IPv4, or IPv6 (full or "::"-compressed)
             const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-            const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
-            if (ipv4Pattern.test(input) || ipv6Pattern.test(input)) {
+            const ipv6Pattern = /^[0-9a-fA-F:]*:[0-9a-fA-F:]*$/;
+            if (ipv4Pattern.test(input) || (input.includes(':') && ipv6Pattern.test(input))) {
                 return 'ip';
             }
-            
+
             // Default to domain
             return 'domain';
         }
@@ -814,11 +899,11 @@
         // Format RDAP data for display
         function formatRDAPData(data, query, type) {
             let html = '';
-            
+
             // Basic info
             html += `
                 <div class="data-section">
-                    <div class="section-title"><i class="fas fa-info-circle"></i> Basic Information</div>
+                    <h3 class="section-title"><span aria-hidden="true">ℹ️</span> Basic Information</h3>
                     <div class="data-grid">
                         <div class="data-item"><div class="data-label">Handle</div><div class="data-value">${escapeHtml(data.handle || 'N/A')}</div></div>
                         <div class="data-item"><div class="data-label">Type</div><div class="data-value">${escapeHtml(data.objectClassName || type)}</div></div>
@@ -826,12 +911,12 @@
                     </div>
                 </div>
             `;
-            
+
             // Events (dates)
             if (data.events && data.events.length) {
                 html += `
                     <div class="data-section">
-                        <div class="section-title"><i class="fas fa-calendar-alt"></i> Important Dates</div>
+                        <h3 class="section-title"><span aria-hidden="true">📅</span> Important Dates</h3>
                         <div class="data-grid">
                 `;
                 data.events.forEach(event => {
@@ -845,18 +930,18 @@
                 });
                 html += `</div></div>`;
             }
-            
+
             // Entities (contacts)
             if (data.entities && data.entities.length) {
                 html += `
                     <div class="data-section">
-                        <div class="section-title"><i class="fas fa-users"></i> Contacts & Entities</div>
+                        <h3 class="section-title"><span aria-hidden="true">👥</span> Contacts & Entities</h3>
                         <div class="data-grid">
                 `;
                 data.entities.forEach(entity => {
                     const roles = entity.roles ? entity.roles.join(', ') : 'unknown';
-                    const name = entity.vcardArray ? 
-                        entity.vcardArray[1]?.find(v => v[0] === 'fn')?.[3] : 
+                    const name = entity.vcardArray ?
+                        entity.vcardArray[1]?.find(v => v[0] === 'fn')?.[3] :
                         entity.handle || 'N/A';
                     html += `
                         <div class="data-item">
@@ -868,12 +953,12 @@
                 });
                 html += `</div></div>`;
             }
-            
+
             // Nameservers (for domains)
             if (data.nameservers && data.nameservers.length) {
                 html += `
                     <div class="data-section">
-                        <div class="section-title"><i class="fas fa-server"></i> Nameservers</div>
+                        <h3 class="section-title"><span aria-hidden="true">🖥️</span> Nameservers</h3>
                         <div class="data-grid">
                 `;
                 data.nameservers.forEach(ns => {
@@ -883,12 +968,12 @@
                 });
                 html += `</div></div>`;
             }
-            
+
             // Status
             if (data.status && data.status.length) {
                 html += `
                     <div class="data-section">
-                        <div class="section-title"><i class="fas fa-flag-checkered"></i> Status</div>
+                        <h3 class="section-title"><span aria-hidden="true">🏁</span> Status</h3>
                         <div class="data-grid">
                 `;
                 data.status.forEach(status => {
@@ -896,12 +981,12 @@
                 });
                 html += `</div></div>`;
             }
-            
+
             // Public IDs
             if (data.publicIds && data.publicIds.length) {
                 html += `
                     <div class="data-section">
-                        <div class="section-title"><i class="fas fa-id-card"></i> Registry Identifiers</div>
+                        <h3 class="section-title"><span aria-hidden="true">🆔</span> Registry Identifiers</h3>
                         <div class="data-grid">
                 `;
                 data.publicIds.forEach(id => {
@@ -914,21 +999,21 @@
                 });
                 html += `</div></div>`;
             }
-            
+
             // Full JSON (collapsible)
             html += `
                 <div class="data-section">
-                    <div class="section-title"><i class="fas fa-code"></i> Full RDAP Response (JSON)</div>
+                    <h3 class="section-title"><span aria-hidden="true">💻</span> Full RDAP Response (JSON)</h3>
                     <div class="json-viewer">${escapeHtml(JSON.stringify(data, null, 2))}</div>
                 </div>
             `;
-            
+
             return html;
         }
 
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
+            return String(str).replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';
@@ -943,19 +1028,18 @@
                 showError('Please enter a domain, IP address, or ASN');
                 return;
             }
-            
+
             // Auto-detect type
             const detectedType = detectType(query);
             currentQueryType = detectedType;
-            
+
             // Update active button visually
             document.querySelectorAll('.type-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-type') === detectedType) {
-                    btn.classList.add('active');
-                }
+                const active = btn.getAttribute('data-type') === detectedType;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
             });
-            
+
             // Format ASN properly
             let lookupQuery = query;
             if (detectedType === 'asn') {
@@ -965,36 +1049,36 @@
                     lookupQuery = query.toUpperCase();
                 }
             }
-            
+
             const endpoint = RDAP_ENDPOINTS[detectedType];
             const url = endpoint + encodeURIComponent(lookupQuery);
-            
+
             // Show loading
             lookupBtn.disabled = true;
             lookupBtn.innerHTML = '<span class="loader"></span> Looking up...';
             resultArea.style.display = 'none';
             emptyState.style.display = 'none';
             errorState.style.display = 'none';
-            
+
             try {
                 const response = await fetch(url);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const data = await response.json();
                 currentData = data;
-                
+
                 resultContent.innerHTML = formatRDAPData(data, query, detectedType);
                 resultArea.style.display = 'block';
-                
+
             } catch (err) {
                 console.error('RDAP lookup error:', err);
                 showError(`Failed to lookup "${query}": ${err.message}<br><br>Note: Not all domains/IPs have RDAP records available.`);
             } finally {
                 lookupBtn.disabled = false;
-                lookupBtn.innerHTML = '<i class="fas fa-search"></i> Lookup';
+                lookupBtn.innerHTML = '<span aria-hidden="true">🔍</span> Lookup';
             }
         }
 
@@ -1010,24 +1094,39 @@
             if (currentData) {
                 navigator.clipboard.writeText(JSON.stringify(currentData, null, 2));
                 const originalText = copyResultBtn.innerHTML;
-                copyResultBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyResultBtn.innerHTML = '<span aria-hidden="true">✅</span> Copied!';
                 setTimeout(() => {
                     copyResultBtn.innerHTML = originalText;
                 }, 2000);
             }
         });
 
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.getAttribute('data-tab');
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                if (tabId === 'about') document.getElementById('aboutTab').classList.add('active');
-                if (tabId === 'compare') document.getElementById('compareTab').classList.add('active');
-                if (tabId === 'fields') document.getElementById('fieldsTab').classList.add('active');
+        // Tab switching (ARIA tabs pattern: roving tabindex + arrow-key navigation)
+        const tabButtons = ['tabAbout', 'tabCompare', 'tabFields'].map(id => document.getElementById(id));
+        const tabPanels = ['aboutTab', 'compareTab', 'fieldsTab'].map(id => document.getElementById(id));
+
+        function switchTab(index) {
+            tabButtons.forEach((btn, i) => {
+                const active = i === index;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-selected', active ? 'true' : 'false');
+                btn.tabIndex = active ? 0 : -1;
+                tabPanels[i].classList.toggle('active', active);
+            });
+        }
+
+        tabButtons.forEach((btn, i) => {
+            btn.addEventListener('click', () => switchTab(i));
+            btn.addEventListener('keydown', (e) => {
+                let target = null;
+                if (e.key === 'ArrowRight') target = (i + 1) % tabButtons.length;
+                else if (e.key === 'ArrowLeft') target = (i - 1 + tabButtons.length) % tabButtons.length;
+                else if (e.key === 'Home') target = 0;
+                else if (e.key === 'End') target = tabButtons.length - 1;
+                else return;
+                e.preventDefault();
+                tabButtons[target].focus();
+                switchTab(target);
             });
         });
 
@@ -1036,8 +1135,12 @@
             btn.addEventListener('click', () => {
                 const type = btn.getAttribute('data-type');
                 currentQueryType = type;
-                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.type-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
                 queryInput.placeholder = type === 'domain' ? 'example.com' : (type === 'ip' ? '8.8.8.8' : 'AS15169');
             });
         });
@@ -1057,8 +1160,19 @@
             if (e.key === 'Enter') performLookup();
         });
 
-        // Auto-lookup on load
-        setTimeout(() => performLookup(), 100);
+        lookupBtn.addEventListener('click', performLookup);
+
+        // Only auto-lookup when a query is passed explicitly via URL
+        function handleUrlParameter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryParam = urlParams.get('query');
+            if (queryParam) {
+                queryInput.value = queryParam;
+                performLookup();
+            }
+        }
+
+        window.addEventListener('load', handleUrlParameter);
     </script>
 </body>
 </html>
