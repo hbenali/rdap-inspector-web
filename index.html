@@ -77,6 +77,8 @@
             --accent: #10b981;
             --accent-light: #34d399;
             --accent-dark: #059669;
+            --accent-solid: #047857;
+            --accent-solid-hover: #036450;
             --success: #10b981;
             --warning: #f59e0b;
             --info: #3b82f6;
@@ -100,6 +102,8 @@
             --accent: #34d399;
             --accent-light: #6ee7b7;
             --accent-dark: #10b981;
+            --accent-solid: #0a7a52;
+            --accent-solid-hover: #065f40;
             --bg: #0f172a;
             --bg-secondary: #1e293b;
             --text: #f1f5f9;
@@ -313,7 +317,7 @@
         }
 
         .type-btn.active {
-            background: var(--accent);
+            background: var(--accent-solid);
             color: white;
         }
 
@@ -348,7 +352,7 @@
         }
 
         button {
-            background: var(--accent);
+            background: var(--accent-solid);
             border: none;
             padding: 0.8rem 2rem;
             border-radius: 3rem;
@@ -362,7 +366,7 @@
         }
 
         button:hover {
-            background: var(--accent-dark);
+            background: var(--accent-solid-hover);
             transform: translateY(-2px);
         }
 
@@ -404,7 +408,7 @@
         }
 
         .example-link:hover {
-            background: var(--accent);
+            background: var(--accent-solid);
             color: white;
         }
 
@@ -557,7 +561,7 @@
         }
 
         .tab-btn.active {
-            background: var(--accent);
+            background: var(--accent-solid);
             color: white;
         }
 
@@ -642,6 +646,7 @@
     </div>
 
     <div class="container">
+        <main>
         <!-- Hero Section -->
         <div class="hero">
             <div class="hero-icon">
@@ -748,7 +753,7 @@
                     <tbody>
                         <tr style="border-bottom: 1px solid var(--card-border);">
                             <td style="padding: 0.75rem;">Format</td>
-                            <td style="padding: 0.75rem;"><span style="background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 1rem;">JSON</span></td>
+                            <td style="padding: 0.75rem;"><span style="background: var(--accent-solid); color: white; padding: 0.2rem 0.6rem; border-radius: 1rem;">JSON</span></td>
                             <td style="padding: 0.75rem;">Plain text (inconsistent)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid var(--card-border);">
@@ -804,6 +809,7 @@
                 </div>
             </div>
         </div>
+        </main>
 
         <div class="footer">
             <p>🔍 RDAP Inspector · Uses official RDAP servers for domains (IANA), IPs (ARIN/RIPE/APNIC/AFRINIC/LACNIC), and ASNs · Privacy-protected registration data</p>
