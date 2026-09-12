@@ -12,6 +12,11 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://rdap.hbenali.ovh/">
 
+    <!-- Security (static hosting: no custom HTTP headers, so CSP/referrer are set here; X-Frame-Options/X-Content-Type-Options need a real header and aren't achievable via meta) -->
+    <!-- connect-src stays open to https: because rdap.org 302-redirects lookups to whichever registry's RDAP server (rdap.verisign.com, rdap.arin.net, etc.) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="RDAP Inspector — Domain, IP & ASN Registration Lookup">
@@ -94,6 +99,7 @@
             --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             --radius-lg: 1rem;
             --radius-xl: 1.5rem;
+            --accent-aa: #047857;
         }
 
         [data-theme="dark"] {
@@ -114,6 +120,7 @@
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
             --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+            --accent-aa: #34d399;
         }
 
         * {
@@ -398,7 +405,7 @@
         }
 
         .example-link {
-            color: var(--accent);
+            color: var(--accent-aa);
             text-decoration: none;
             font-size: 0.9rem;
             background: var(--bg-secondary);
