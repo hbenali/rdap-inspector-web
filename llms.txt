@@ -1,0 +1,8 @@
+# RDAP Inspector
+
+> Free, single-page RDAP lookup tool for domains, IP addresses, and ASNs — the modern, standardized replacement for WHOIS.
+
+Static site (no backend, no build step, no dependencies) at https://rdap.hbenali.ovh — a single `index.html` calling a public API directly from the browser. Auto-detects the query type and shows a structured view (basic info, dates, contacts/entities, nameservers, status, registry identifiers) alongside the full raw JSON response.
+
+## Pages
+- [RDAP Inspector](https://rdap.hbenali.ovh/): the tool itself.
