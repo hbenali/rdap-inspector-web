@@ -1,7 +1,13 @@
-const CACHE_NAME = 'rdap-inspector-v1';
+const CACHE_NAME = 'rdap-inspector-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
+  '/site.css',
+  '/app.js',
+  '/fonts/big-shoulders-latin-wght.woff2',
+  '/fonts/newsreader-latin-wght.woff2',
+  '/fonts/newsreader-italic-latin-wght.woff2',
+  '/fonts/jetbrains-mono-latin-wght.woff2',
   '/404.html',
   '/manifest.json',
   '/favicon.svg',

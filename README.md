@@ -9,7 +9,7 @@ No backend, no build step, no dependencies — it's one static `index.html` call
 - **Lookup** any domain, IPv4/IPv6 address, or ASN via RDAP, with automatic type detection
 - **Structured view** of the response — basic info, dates, contacts/entities, nameservers, status, registry identifiers
 - **Full JSON** viewer with one-click copy
-- **Dark mode** with persisted preference
+- **Dark editorial design**, self-hosted fonts, no external requests except the RDAP lookups
 - Fully responsive, accessible (ARIA tabs, labeled fields), and SEO-tagged (Open Graph, Twitter Card, JSON-LD)
 
 ## Running locally

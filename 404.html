@@ -6,56 +6,29 @@
     <title>404 · RDAP Not Found</title>
     <meta name="description" content="The page you're looking for doesn't exist. Head back to RDAP Inspector to query domain, IP, or ASN registration data.">
     <meta name="robots" content="noindex, follow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="alternate icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta name="theme-color" content="#10b981">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-        .card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 3rem;
-            text-align: center;
-            max-width: 500px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .error-code { font-size: 6rem; font-weight: 700; color: #10b981; }
-        h1 { color: white; margin: 1rem 0; }
-        p { color: #94a3b8; margin-bottom: 2rem; }
-        .btn {
-            display: inline-block;
-            background: #10b981;
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 2rem;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .btn:hover { background: #059669; }
-        footer { margin-top: 1.5rem; color: #64748b; font-size: 0.85rem; }
-        footer a { color: #94a3b8; text-decoration: underline; }
-        footer a:hover { color: #34d399; }
-    </style>
+    <meta name="theme-color" content="#0c1218">
+    <meta name="color-scheme" content="dark">
+
+    <!-- Absolute paths: this page is served for any missing URL, at any depth -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/big-shoulders-latin-wght.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/newsreader-latin-wght.woff2" crossorigin>
+    <link rel="stylesheet" href="/site.css">
 </head>
 <body>
-    <div class="card">
-        <div class="error-code">404</div>
-        <h1>RDAP Record Not Found</h1>
-        <p>The registration data you're looking for doesn't exist or isn't available via RDAP.</p>
-        <a href="/" class="btn">← Back to RDAP Inspector</a>
-        <footer>rdap.hbenali.ovh · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a></footer>
-    </div>
+    <main class="nf wrap">
+        <p class="display nf-code" aria-hidden="true">404</p>
+        <h1 class="display">RDAP Record Not Found</h1>
+        <p class="nf-lead">The registration data you're looking for doesn't exist or isn't available via RDAP.</p>
+        <ul class="nf-links">
+            <li><a class="link" href="/">Back to RDAP Inspector</a></li>
+            <li><a class="link" href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh<span class="sr-only"> (opens in a new tab)</span></a></li>
+        </ul>
+    </main>
 </body>
 </html>
